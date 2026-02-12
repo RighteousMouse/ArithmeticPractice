@@ -1,41 +1,85 @@
 package com.example.arithmeticpractice
 
+import FastMathMode
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.arithmeticpractice.logic.GameMode
+import com.example.arithmeticpractice.logic.Problem
+import com.example.arithmeticpractice.logic.ProblemEnums
+import com.example.arithmeticpractice.logic.generateProblem
+import com.example.arithmeticpractice.ui.screen.GameScreen
 import com.example.arithmeticpractice.ui.theme.ArithmeticPracticeTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
         setContent {
             ArithmeticPracticeTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-
-                }
+                MyApp()
             }
         }
     }
 }
 
 @Composable
-fun DisplayProblem() {
+fun MyApp() {
 
+    // Create the game mode the player will use
+    val gameMode = FastMathMode(
+        rangeMax = 10,
+        operators = setOf(
+            ProblemEnums.Operator.ADD,
+            ProblemEnums.Operator.SUB,
+            ProblemEnums.Operator.MULT,
+            ProblemEnums.Operator.DIV
+        ),
+        answers = setOf(
+            ProblemEnums.AnswerType.ANSWER,
+            ProblemEnums.AnswerType.NUMBER1,
+            ProblemEnums.AnswerType.NUMBER2
+            )
+    )
+
+    Surface(modifier = Modifier.fillMaxSize()) {
+        GameScreen(gameMode, totalTime = 60)
+    }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    ArithmeticPracticeTheme {
+class PreviewGameMode : GameMode {
+    override val gameName = "Fast Math (Preview)"
+    override val rangeMax = 10
+    override val validOperators = emptySet<ProblemEnums.Operator>()
+    override val validAnswers = emptySet<ProblemEnums.AnswerType>()
 
+    override var currentProblem: Problem = generateProblem(
+        10,
+        ProblemEnums.Operator.ADD,
+        ProblemEnums.AnswerType.ANSWER
+    )
+
+    override fun nextProblem() { /* Do nothing for preview */ }
+
+    override fun gameOver(): Boolean = false
+
+    override fun checkAnswer(input: String): Boolean = true
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun GameScreenPreview() {
+    ArithmeticPracticeTheme {
+        GameScreen(
+            gameMode = PreviewGameMode(),
+            totalTime = 60
+        )
     }
 }

@@ -1,16 +1,21 @@
 package com.example.arithmeticpractice.logic
-
-fun generateRandomProblem(rangeMax: Int): Problem {
-    val operator = randomOperator()
+import android.R.attr.data
+import com.example.arithmeticpractice.logic.ProblemEnums.AnswerType
+import com.example.arithmeticpractice.logic.ProblemEnums.Operator
+fun generateProblem(
+    rangeMax: Int,
+    operator: ProblemEnums.Operator,
+    blank: ProblemEnums.AnswerType
+): Problem {
 
     return when (operator) {
-        Operator.ADD -> generateAddition(rangeMax)
-        Operator.SUB -> generateSubtraction(rangeMax)
-        Operator.MULT -> generateMultiplication(rangeMax)
-        Operator.DIV -> generateDivision(rangeMax)
+        ProblemEnums.Operator.ADD -> generateAddition(rangeMax, blank)
+        ProblemEnums.Operator.SUB -> generateSubtraction(rangeMax, blank)
+        ProblemEnums.Operator.MULT -> generateMultiplication(rangeMax, blank)
+        ProblemEnums.Operator.DIV -> generateDivision(rangeMax, blank)
     }
 }
-fun generateDivision(rangeMax: Int): Problem {
+fun generateDivision(rangeMax: Int, blank: AnswerType): Problem {
     require(rangeMax >= 1)
 
     val numb1 = (rangeMax/2..rangeMax).random()
@@ -22,9 +27,9 @@ fun generateDivision(rangeMax: Int): Problem {
 
     val answer = executeProblem(numb1,numb2,op)
 
-    return Problem(numb1,numb2,op,answer)
+    return Problem(numb1,op,numb2,answer,blank)
 }
-fun generateMultiplication(rangeMax: Int): Problem {
+fun generateMultiplication(rangeMax: Int, blank: AnswerType): Problem {
     require(rangeMax >= 1)
 
     val numb1 = (1..rangeMax).random()
@@ -32,9 +37,9 @@ fun generateMultiplication(rangeMax: Int): Problem {
     val op = Operator.MULT
     val answer = executeProblem(numb1,numb2,op)
 
-    return Problem(numb1,numb2,op,answer)
+    return Problem(numb1,op,numb2,answer,blank)
 }
-fun generateAddition(rangeMax: Int): Problem {
+fun generateAddition(rangeMax: Int, blank: AnswerType): Problem {
     require(rangeMax >= 1)
 
     val numb1 = (1..rangeMax).random()
@@ -42,9 +47,9 @@ fun generateAddition(rangeMax: Int): Problem {
     val op = Operator.ADD
     val answer = executeProblem(numb1,numb2,op)
 
-    return Problem(numb1,numb2,op,answer)
+    return Problem(numb1,op,numb2,answer,blank)
 }
-fun generateSubtraction(rangeMax: Int): Problem {
+fun generateSubtraction(rangeMax: Int, blank: AnswerType): Problem {
     require(rangeMax >= 1)
 
     val numb1 = (rangeMax/2..rangeMax).random()
@@ -52,20 +57,7 @@ fun generateSubtraction(rangeMax: Int): Problem {
     val op = Operator.SUB
     val answer = executeProblem(numb1,numb2,op)
 
-    return Problem(numb1,numb2,op,answer)
-}
-data class Problem(
-    val numb1: Int,
-    val numb2: Int,
-    val operator: Operator,
-    val answer: Int
-)
-fun randomOperator(): Operator = Operator.entries.random()
-enum class Operator(val symbol: String) {
-    ADD("+"),
-    SUB("-"),
-    MULT("×"),
-    DIV("÷")
+    return Problem(numb1,op,numb2,answer,blank)
 }
 fun add(numb1: Int, numb2: Int): Int = numb1 + numb2
 fun subtract(numb1: Int, numb2: Int): Int = numb1 - numb2
@@ -87,3 +79,10 @@ fun validNumbs(numb1: Int, numb2: Int, operator: Operator): Boolean {
         Operator.DIV -> numb2 != 0 && numb1 % numb2 == 0
     }
 }
+data class Problem(
+    val numb1: Int,
+    var operator: Operator,
+    val numb2: Int,
+    val answer: Int,
+    var blankPart: AnswerType
+)
